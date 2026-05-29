@@ -1,13 +1,13 @@
-"""Test tensorpac functions."""
+"""Test torchpac functions."""
 import numpy as np
 from scipy import stats
 
 import matplotlib
 import matplotlib.pyplot as plt
 
-from tensorpac import Pac, EventRelatedPac, PreferredPhase
-from tensorpac.utils import pac_trivec
-from tensorpac.signals import pac_signals_wavelet
+from torchpac import Pac, EventRelatedPac, PreferredPhase
+from torchpac.utils import pac_trivec
+from torchpac.signals import pac_signals_wavelet
 
 
 

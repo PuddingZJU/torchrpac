@@ -5,8 +5,8 @@ Bin amplitude according to the phase
 
 This example illustrate how to bin the amplitude according to the phase.
 """
-from tensorpac.signals import pac_signals_tort
-from tensorpac.utils import BinAmplitude
+from torchpac.signals import pac_signals_tort
+from torchpac.utils import BinAmplitude
 
 import matplotlib.pyplot as plt
 

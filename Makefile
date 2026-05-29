@@ -3,7 +3,7 @@
 clean_dist:
 	@rm -rf build/
 	@rm -rf build/
-	@rm -rf tensorpac.egg-info/
+	@rm -rf torchpac.egg-info/
 	@rm -rf dist/
 	@echo "Dist cleaned"
 

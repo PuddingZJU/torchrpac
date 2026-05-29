@@ -2,19 +2,48 @@
 import numpy as np
 from functools import partial
 
-from tensorpac.config import CONFIG
 
-
-def get_pac_fcn(idp, n_bins, p, implementation="tensor", full=False):
+def get_pac_fcn(idp, n_bins, p, implementation="tensor", full=False,
+                device=None, dtype=None):
     """Get the function for computing Phase-Amplitude coupling.
 
-    This function also allow to switch between Tensor / Numba implementations
-    of most of the functions.
+    Parameters
+    ----------
+    idp            : int  – PAC method index (1-6)
+    n_bins         : int  – number of phase bins (MI / HR methods)
+    p              : float – statistical threshold (ndPAC)
+    implementation : {'tensor', 'numba', 'gpu'}
+    full           : bool – if True return the full dict instead of one fcn
+    device         : torch.device | None – required when implementation='gpu'
+    dtype          : torch.dtype  | None – required when implementation='gpu'
+
+    Returns
+    -------
+    fcn or dict of fcns with signature f(pha, amp) -> np.ndarray
     """
-    n_bins, p = np.int64(n_bins), np.float64(p)
-    assert implementation in ['tensor', 'numba']
-    if implementation is 'tensor':
-        from tensorpac.methods.meth_pac import (
+    n_bins = np.int64(n_bins)
+    p      = np.float64(p)
+
+    assert implementation in ['tensor', 'numba', 'gpu'], (
+        "implementation must be 'tensor', 'numba', or 'gpu'.")
+
+    if implementation == 'gpu':
+        from torchpac.methods.meth_pac_gpu import (
+            mean_vector_length_gpu, modulation_index_gpu, heights_ratio_gpu,
+            norm_direct_pac_gpu, phase_locking_value_gpu, gauss_cop_pac_gpu)
+        METH = {
+            1: partial(mean_vector_length_gpu,  device=device, dtype=dtype),
+            2: partial(modulation_index_gpu,    device=device, dtype=dtype,
+                       n_bins=int(n_bins)),
+            3: partial(heights_ratio_gpu,       device=device, dtype=dtype,
+                       n_bins=int(n_bins)),
+            4: partial(norm_direct_pac_gpu,     device=device, dtype=dtype,
+                       p=float(p)),
+            5: partial(phase_locking_value_gpu, device=device, dtype=dtype),
+            6: partial(gauss_cop_pac_gpu,       device=device, dtype=dtype),
+        }
+    elif implementation == 'tensor':
+        from torchpac.methods.meth_pac import (
             mean_vector_length, modulation_index, heights_ratio,
             norm_direct_pac, phase_locking_value, gauss_cop_pac)
         METH = {
@@ -24,13 +53,11 @@ def get_pac_fcn(idp, n_bins, p, implementation="tensor", full=False):
             4: partial(norm_direct_pac, p=p),
             5: partial(phase_locking_value),
             6: partial(gauss_cop_pac)}
-    elif implementation is 'numba':
-        from tensorpac.methods.meth_pac_nb import (
+    else:  # numba
+        from torchpac.methods.meth_pac_nb import (
             mean_vector_length_nb, modulation_index_nb, heights_ratio_nb,
             norm_direct_pac_nb, phase_locking_value_nb)
-        # Gaussian-copula PAC can't be compiled with Numba. Hence, we force
-        # using the Tensor implementation
-        from tensorpac.methods.meth_pac import gauss_cop_pac
+        from torchpac.methods.meth_pac import gauss_cop_pac
         METH = {
             1: partial(mean_vector_length_nb),
             2: partial(modulation_index_nb, n_bins=n_bins),
@@ -39,15 +66,12 @@ def get_pac_fcn(idp, n_bins, p, implementation="tensor", full=False):
             5: partial(phase_locking_value_nb),
             6: partial(gauss_cop_pac)}
 
-    if full:
-        return METH
-    else:
-        return METH[idp]
+    return METH if full else METH[idp]
 
 
 def pacstr(idpac):
     """Return correspond methods string."""
-    # pac methods
+    # Pac methods :
     if idpac[0] == 1:
         method = 'Mean Vector Length (MVL, Canolty et al. 2006)'
     elif idpac[0] == 2:
@@ -63,24 +87,19 @@ def pacstr(idpac):
     else:
         raise ValueError("No corresponding pac method.")
 
-    # surrogate method
-    min_shift, max_shift = CONFIG['MIN_SHIFT'], CONFIG['MAX_SHIFT']
-    if not isinstance(max_shift, (int, float)):
-        max_shift = 'n_times'
+    # Surrogate method :
     if idpac[1] == 0:
         suro = 'No surrogates'
     elif idpac[1] == 1:
         suro = 'Permute phase across trials (Tort et al. 2010)'
     elif idpac[1] == 2:
-        suro = (f'Swap amplitude time blocks (min_shift={min_shift}; '
-                f'max_shift={max_shift}) (Bahramisharif et al. 2013)')
+        suro = 'Swap amplitude time blocks (Bahramisharif et al. 2013)'
     elif idpac[1] == 3:
-        suro = (f'Time lag (min_shift={min_shift}; max_shift={max_shift}) '
-                f'(Canolty et al. 2006)')
+        suro = 'Time lag (Canolty et al. 2006)'
     else:
         raise ValueError("No corresponding surrogate method.")
 
-    # normalization methods
+    # Normalization methods :
     if idpac[2] == 0:
         norm = 'No normalization'
     elif idpac[2] == 1:

@@ -13,8 +13,8 @@ amplitude coupling first followed by a random noise.
 """
 import numpy as np
 
-from tensorpac import EventRelatedPac
-from tensorpac.signals import pac_signals_wavelet
+from torchpac import EventRelatedPac
+from torchpac.signals import pac_signals_wavelet
 
 import matplotlib.pyplot as plt
 
@@ -43,7 +43,7 @@ time = np.arange(x.shape[1]) / sf
 ###############################################################################
 # Define an ERPAC object and extract the phase and the amplitude
 ###############################################################################
-# use :class:`tensorpac.EventRelatedPac.filter` method to extract phases and
+# use :class:`torchpac.EventRelatedPac.filter` method to extract phases and
 # amplitudes
 
 # define an ERPAC object

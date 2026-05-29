@@ -6,10 +6,10 @@ import numpy as np
 import pandas as pd
 from time import time as tst
 
-from tensorpac.signals import pac_signals_wavelet
-from tensorpac import Pac
-from tensorpac.spectral import hilbertm
-from tensorpac.methods import get_pac_fcn
+from torchpac.signals import pac_signals_wavelet
+from torchpac import Pac
+from torchpac.spectral import hilbertm
+from torchpac.methods import get_pac_fcn
 
 import seaborn as sns
 import matplotlib.pyplot as plt

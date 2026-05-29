@@ -6,7 +6,7 @@ Compare normalization types
 This example illustrates the effect of the different implemented
 normalizations. First, the true PAC is estimated, then this is the surrogate
 distribution that is estimated (i.e the PAC that could be obtained by chance).
-Finally, the true PAC is corrected by this distribution. Tensorpac includes
+Finally, the true PAC is corrected by this distribution. Torchpac includes
 four types of normalization that should give similar results :
 
     * Substract the mean of surrogates (1)
@@ -17,8 +17,8 @@ four types of normalization that should give similar results :
 """
 from textwrap import wrap
 
-from tensorpac import Pac
-from tensorpac.signals import pac_signals_wavelet
+from torchpac import Pac
+from torchpac.signals import pac_signals_wavelet
 
 import matplotlib.pyplot as plt
  

@@ -6,9 +6,9 @@ import numpy as np
 from scipy import stats
 from mne.stats import bonferroni_correction
 
-from tensorpac.utils import pac_trivec
-from tensorpac.signals import pac_signals_wavelet
-from tensorpac import EventRelatedPac
+from torchpac.utils import pac_trivec
+from torchpac.signals import pac_signals_wavelet
+from torchpac import EventRelatedPac
 
 import matplotlib.pyplot as plt
 import seaborn as sns

@@ -28,7 +28,7 @@ install:
   # install additional dependencies
   - "pip install setuptools mne pandas statsmodels pytest"
   - "dir"
-  # ------------------- TENSORPAC -------------------
+  # ------------------- TORCHPAC -------------------
   - "python setup.py develop"
 
 test_script:

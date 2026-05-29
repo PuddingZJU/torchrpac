@@ -1,7 +1,7 @@
 """Test stastical functions."""
 import numpy as np
 
-from tensorpac.stats import test_stationarity as stats_stationarity
+from torchpac.stats import test_stationarity as stats_stationarity
 
 n_epochs = 8
 n_times = 200

@@ -1,8 +1,8 @@
-"""Test tensorpac utils."""
+"""Test torchpac utils."""
 import numpy as np
 import matplotlib
 
-from tensorpac.utils import (pac_vec, pac_trivec, PSD, BinAmplitude, ITC,
+from torchpac.utils import (pac_vec, pac_trivec, PSD, BinAmplitude, ITC,
                              PeakLockedTF)
 
 

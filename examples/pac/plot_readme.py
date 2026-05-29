@@ -5,8 +5,8 @@ README example
 
 Reproduced the figure in the README.
 """
-from tensorpac import Pac
-from tensorpac.signals import pac_signals_tort
+from torchpac import Pac
+from torchpac.signals import pac_signals_tort
 
 import matplotlib.pyplot as plt
 

@@ -6,11 +6,11 @@ import numpy as np
 import pandas as pd
 from time import time as tst
 
-from tensorpac.signals import pac_signals_tort, pac_signals_wavelet
-from tensorpac.methods import (mean_vector_length, modulation_index,
+from torchpac.signals import pac_signals_tort, pac_signals_wavelet
+from torchpac.methods import (mean_vector_length, modulation_index,
                                heights_ratio, norm_direct_pac,
                                phase_locking_value)
-from tensorpac import Pac
+from torchpac import Pac
 
 
 import seaborn as sns

@@ -2,7 +2,7 @@
 import numpy as np
 import logging
 
-logger = logging.getLogger('tensorpac')
+logger = logging.getLogger('torchpac')
 
 
 class _PacVisual(object):
@@ -91,7 +91,7 @@ class _PacVisual(object):
             The current matplotlib axes.
         """
         # Check if pac is 2 dimensions :
-        if pac.ndim is not 2:
+        if pac.ndim != 2:
             raise ValueError("The PAC variable must have two dimensions.")
         # Try import matplotlib :
         try:
@@ -111,9 +111,7 @@ class _PacVisual(object):
         # Polar plot :
         if polar:
             plotas = 'pcolor'
-            if isinstance(subplot, int):
-                subplot = [int(k) for k in str(subplot)]
-            plt.subplot(*tuple(subplot), projection='polar')
+            plt.subplot(subplot, projection='polar')
         # Check vmin / vmax
         if (vmin is None) and (vmax is None) and self._autovmM:
             vmin, vmax = min(0, np.nanmin(pac)), max(0, np.nanmax(pac))
@@ -122,15 +120,15 @@ class _PacVisual(object):
                 vmin = -vmax
         # Plot type :
         toplot = pac.data if levels is not None else pac
-        if plotas is 'imshow':
+        if plotas == 'imshow':
             im = plt.imshow(toplot, aspect='auto', cmap=cmap, origin='upper',
                             vmin=vmin, vmax=vmax, interpolation='none',
                             extent=[xvec[0], xvec[-1], yvec[-1], yvec[0]])
             plt.gca().invert_yaxis()
-        elif plotas is 'contour':
+        elif plotas == 'contour':
             im = plt.contourf(xvec, yvec, toplot, ncontours, cmap=cmap,
                               vmin=vmin, vmax=vmax)
-        elif plotas is 'pcolor':
+        elif plotas == 'pcolor':
             im = plt.pcolormesh(xvec, yvec, toplot, cmap=cmap, vmin=vmin,
                                 vmax=vmax, antialiased=True)
         else:
@@ -178,6 +176,7 @@ class _PacVisual(object):
             for loc, spine in ax.spines.items():
                 if loc in ['left', 'bottom']:
                     spine.set_position(('outward', 10))
+                    spine.set_smart_bounds(True)
 
         if polar:
             ax.grid(True)
@@ -208,7 +207,7 @@ class _PacVisual(object):
 
 
 class _PacPlt(_PacVisual):
-    """Plotting class for :class:`tensorpac.Pac`."""
+    """Plotting class for :class:`torchpac.Pac`."""
 
     def comodulogram(self, pac, xlabel='Frequency for phase (hz)',
                      ylabel='Frequency for amplitude (hz)',
@@ -280,7 +279,7 @@ class _PacPlt(_PacVisual):
         pac, tridx = np.squeeze(pac), np.squeeze(tridx)
         # ___________________ CHECKING ___________________
         # Check if pac is a raw vector :
-        if pac.ndim is not 1:
+        if pac.ndim != 1:
             raise ValueError("The PAC variable must be a row vector.")
         if len(pac) != tridx.shape[0]:
             raise ValueError("PAC and tridx variables must have the same "
@@ -308,7 +307,7 @@ class _PacPlt(_PacVisual):
 
 
 class _PolarPlt(_PacVisual):
-    """Plotting class for :class:`tensorpac.PreferredPhase`."""
+    """Plotting class for :class:`torchpac.PreferredPhase`."""
 
     def polar(self, amp, xvec, yvec, interp=None, **kwargs):
         """Polar representation.

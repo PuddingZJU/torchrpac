@@ -9,8 +9,8 @@ signal to extract the phase (xpha) and the second, the amplitude (xamp).
 If you want to extract local coupling (i.e. on a source/electrode) both xpha
 and xamp have to be set to data.
 """
-from tensorpac import Pac
-from tensorpac.signals import pac_signals_tort
+from torchpac import Pac
+from torchpac.signals import pac_signals_tort
 
 import matplotlib.pyplot as plt
 plt.style.use('seaborn-poster')

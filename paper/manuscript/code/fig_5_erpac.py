@@ -4,8 +4,8 @@ with open("../../paper.json", 'r') as f: cfg = json.load(f)  # noqa
 
 import numpy as np
 
-from tensorpac import EventRelatedPac
-from tensorpac.signals import pac_signals_wavelet
+from torchpac import EventRelatedPac
+from torchpac.signals import pac_signals_wavelet
 
 import seaborn as sns
 import matplotlib.pyplot as plt

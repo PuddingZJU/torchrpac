@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=source
 set BUILDDIR=build
-set SPHINXPROJ=Tensorpac
+set SPHINXPROJ=Torchpac
 
 if "%1" == "" goto help
 

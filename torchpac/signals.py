@@ -3,9 +3,9 @@ import logging
 
 import numpy as np
 
-from tensorpac.spectral import morlet
+from torchpac.spectral import morlet
 
-logger = logging.getLogger('tensorpac')
+logger = logging.getLogger('torchpac')
 
 
 def pac_signals_wavelet(f_pha=10., f_amp=100., sf=1024., n_times=4000.,

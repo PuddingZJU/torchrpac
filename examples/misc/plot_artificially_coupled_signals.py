@@ -5,7 +5,7 @@ Generate artificially coupled signals
 
 Use the pac_signals_tort function to generate artificial PAC.
 """
-from tensorpac.signals import pac_signals_tort
+from torchpac.signals import pac_signals_tort
 import matplotlib.pyplot as plt
 
 # Generate one signal containing PAC. By default, this signal present a

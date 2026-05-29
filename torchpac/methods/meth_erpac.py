@@ -4,8 +4,8 @@ from scipy.stats import chi2
 
 from joblib import Parallel, delayed
 
-from tensorpac.gcmi import nd_mi_gg
-from tensorpac.config import CONFIG
+from torchpac.gcmi import nd_mi_gg
+from torchpac.config import CONFIG
 
 
 def pearson(x, y, st='i...j, k...j->ik...'):

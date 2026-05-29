@@ -32,21 +32,21 @@ In this tutorial we propose to answer to those three questions using following
 structure :
 
     1. Compute the inter-trial coherence (ITC) and see if the phases are
-       realigned at a given time point (:class:`tensorpac.utils.ITC`)
+       realigned at a given time point (:class:`torchpac.utils.ITC`)
     2. Compute the Power Spectrum Density (PSD) to try to find the phase
-       frequency range (:class:`tensorpac.utils.PSD`)
+       frequency range (:class:`torchpac.utils.PSD`)
     3. Compute the Event-Related PAC (ERPAC) to have a first idea of where the
        coupling occurs in time, especially if it start at a given time point
-       (:class:`tensorpac.EventRelatedPac`)
+       (:class:`torchpac.EventRelatedPac`)
     4. Realign time-frequency representations based on the starting time-point
        found with the ERPAC and see if the gamma burst follow the rhythm
        imposed by a phase. This step should also gives and idea of the
-       amplitude frequency range (:class:`tensorpac.utils.PeakLockedTF`)
+       amplitude frequency range (:class:`torchpac.utils.PeakLockedTF`)
     5. Compute the comodulogram and statistics in order to test if the
        hypothetic coupling can be considered as statistically different from
-       PAC that could be obtained by chance (:class:`tensorpac.Pac`)
-    6. Preferred-phase identification (:class:`tensorpac.utils.BinAmplitude`
-       and :class:`tensorpac.PreferredPhase`)
+       PAC that could be obtained by chance (:class:`torchpac.Pac`)
+    6. Preferred-phase identification (:class:`torchpac.utils.BinAmplitude`
+       and :class:`torchpac.PreferredPhase`)
 """
 import os
 import urllib
@@ -54,8 +54,8 @@ import urllib
 import numpy as np
 from scipy.io import loadmat
 
-from tensorpac import Pac, EventRelatedPac, PreferredPhase
-from tensorpac.utils import PeakLockedTF, PSD, ITC, BinAmplitude
+from torchpac import Pac, EventRelatedPac, PreferredPhase
+from torchpac.utils import PeakLockedTF, PSD, ITC, BinAmplitude
 
 import matplotlib.pyplot as plt
 

@@ -14,8 +14,8 @@ order to perform the cluster-based correction
 """
 import numpy as np
 
-from tensorpac import Pac
-from tensorpac.signals import pac_signals_wavelet
+from torchpac import Pac
+from torchpac.signals import pac_signals_wavelet
 
 from mne.stats import permutation_cluster_test
 

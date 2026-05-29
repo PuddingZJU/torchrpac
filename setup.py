@@ -5,14 +5,14 @@ import os
 from setuptools import setup, find_packages
 
 __version__ = "0.6.5"
-NAME = 'tensorpac'
+NAME = 'torchpac'
 AUTHOR = "Etienne Combrisson"
 MAINTAINER = "Etienne Combrisson"
 EMAIL = 'e.combrisson@gmail.com'
 KEYWORDS = "phase-amplitude coupling pac tensor oscillation meg eeg python"
 DESCRIPTION = "Tensor-based Phase-Amplitude Coupling"
-URL = 'http://etiennecmb.github.io/tensorpac/'
-DOWNLOAD_URL = ("https://github.com/EtienneCmb/tensorpac/archive/v" +
+URL = 'http://etiennecmb.github.io/torchpac/'
+DOWNLOAD_URL = ("https://github.com/EtienneCmb/torchpac/archive/v" +
                 __version__ + ".tar.gz")
 # Data path :
 PACKAGE_DATA = {}
@@ -27,7 +27,7 @@ setup(
     name=NAME,
     version=__version__,
     packages=find_packages(),
-    package_dir={'tensorpac': 'tensorpac'},
+    package_dir={'torchpac': 'torchpac'},
     package_data=PACKAGE_DATA,
     include_package_data=True,
     description=DESCRIPTION,
@@ -35,7 +35,7 @@ setup(
     platforms='any',
     setup_requires=['numpy', 'joblib'],
     install_requires=[
-        "numpy",
+        "numpy", 
         "scipy",
         "joblib"
     ],

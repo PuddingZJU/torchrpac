@@ -1,60 +1,57 @@
 =========
-Tensorpac
+Torchpac
 =========
 
-.. image:: https://github.com/EtienneCmb/tensorpac/workflows/Tensorpac/badge.svg
-    :target: https://github.com/EtienneCmb/tensorpac/workflows/Tensorpac
+.. image:: https://github.com/EtienneCmb/torchpac/workflows/Torchpac/badge.svg
+    :target: https://github.com/EtienneCmb/torchpac/workflows/Torchpac
 
-.. image:: https://travis-ci.org/EtienneCmb/tensorpac.svg?branch=master
-    :target: https://travis-ci.org/EtienneCmb/tensorpac
+.. image:: https://travis-ci.org/EtienneCmb/torchpac.svg?branch=master
+    :target: https://travis-ci.org/EtienneCmb/torchpac
 
-.. image:: https://circleci.com/gh/EtienneCmb/tensorpac/tree/master.svg?style=svg
-    :target: https://circleci.com/gh/EtienneCmb/tensorpac/tree/master
+.. image:: https://circleci.com/gh/EtienneCmb/torchpac/tree/master.svg?style=svg
+    :target: https://circleci.com/gh/EtienneCmb/torchpac/tree/master
 
 .. image:: https://ci.appveyor.com/api/projects/status/0arxtw05583gc3e2/branch/master?svg=true
-    :target: https://ci.appveyor.com/project/EtienneCmb/tensorpac/branch/master
+    :target: https://ci.appveyor.com/project/EtienneCmb/torchpac/branch/master
 
-.. image:: https://codecov.io/gh/EtienneCmb/tensorpac/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/EtienneCmb/tensorpac
+.. image:: https://codecov.io/gh/EtienneCmb/torchpac/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/EtienneCmb/torchpac
 
-.. image:: https://badge.fury.io/py/tensorpac.svg
-    :target: https://badge.fury.io/py/tensorpac
+.. image:: https://badge.fury.io/py/torchpac.svg
+    :target: https://badge.fury.io/py/torchpac
 
-.. image:: https://pepy.tech/badge/tensorpac
-    :target: https://pepy.tech/project/tensorpac
+.. image:: https://pepy.tech/badge/torchpac
+    :target: https://pepy.tech/project/torchpac
 
-.. image:: https://badges.gitter.im/EtienneCmb/tensorpac.svg
-    :target: https://gitter.im/EtienneCmb/tensorpac?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
-
-.. image:: https://zenodo.org/badge/93316276.svg
-   :target: https://zenodo.org/badge/latestdoi/93316276
+.. image:: https://badges.gitter.im/EtienneCmb/torchpac.svg
+    :target: https://gitter.im/EtienneCmb/torchpac?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 
 
-.. figure::  https://github.com/EtienneCmb/tensorpac/blob/master/docs/source/picture/tp.png
+.. figure::  https://github.com/EtienneCmb/torchpac/blob/master/docs/source/picture/tp.png
    :align:   center
 
 Description
 -----------
 
-Tensorpac is an Python open-source toolbox for computing Phase-Amplitude Coupling (PAC) using tensors and parallel computing for an efficient, and highly flexible modular implementation of PAC metrics both known and novel. Check out our `documentation <http://etiennecmb.github.io/tensorpac/>`_  for details.
+Torchpac is an Python open-source toolbox for computing Phase-Amplitude Coupling (PAC) using tensors and parallel computing for an efficient, and highly flexible modular implementation of PAC metrics both known and novel. Check out our `documentation <http://etiennecmb.github.io/torchpac/>`_  for details.
 
 Installation
 ------------
 
-Tensorpac uses NumPy, SciPy and joblib for parallel computing. To get started, just open your terminal and run :
+Torchpac uses NumPy, SciPy and joblib for parallel computing. To get started, just open your terminal and run :
 
 
 .. code-block:: console
 
-    $ pip install tensorpac
+    $ pip install torchpac
 
 Code snippet & illustration
 ---------------------------
 
 .. code-block:: python
 
-  from tensorpac import Pac
-  from tensorpac.signals import pac_signals_tort
+  from torchpac import Pac
+  from torchpac.signals import pac_signals_tort
 
   # Dataset of signals artificially coupled between 10hz and 100hz :
   n_epochs = 20   # number of trials
@@ -79,23 +76,23 @@ Code snippet & illustration
 
 
 
-.. figure::  https://github.com/EtienneCmb/tensorpac/blob/master/docs/source/picture/readme.png
+.. figure::  https://github.com/EtienneCmb/torchpac/blob/master/docs/source/picture/readme.png
    :align:   center
 
-Cite Tensorpac
+Cite Torchpac
 --------------
 
-Tensorpac software has been published in `PLoS Computational Biology <https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1008302>`_
+Torchpac software has been published in `PLoS Computational Biology <https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1008302>`_
 
 Use the following Bibtex entry to cite it :
 
 .. code-block:: latex
 
-    @article{combrisson_tensorpac_2020,
-        title = {Tensorpac: {An} open-source {Python} toolbox for tensor-based phase-amplitude coupling measurement in electrophysiological brain signals},
+    @article{combrisson_torchpac_2020,
+        title = {Torchpac: {An} open-source {Python} toolbox for tensor-based phase-amplitude coupling measurement in electrophysiological brain signals},
         volume = {16},
         issn = {1553-7358},
-        shorttitle = {Tensorpac},
+        shorttitle = {Torchpac},
         doi = {10.1371/journal.pcbi.1008302},
         language = {eng},
         number = {10},

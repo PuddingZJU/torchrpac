@@ -3,15 +3,15 @@
 Compare filtering properties
 ============================
 
-Tensorpac provides two ways for extracting phase and amplitude :
+Torchpac provides two ways for extracting phase and amplitude :
 
 * Using filtering followed by Hilbert transform.
 * Using wavelets.
 """
 from __future__ import print_function
 import matplotlib.pyplot as plt
-from tensorpac import Pac
-from tensorpac.signals import pac_signals_wavelet
+from torchpac import Pac
+from torchpac.signals import pac_signals_wavelet
 plt.style.use('seaborn-paper')
 
 # First, we generate a dataset of signals artificially coupled between 10hz

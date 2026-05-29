@@ -4,8 +4,8 @@ with open("../../paper.json", 'r') as f: cfg = json.load(f)  # noqa
 
 import numpy as np
 
-from tensorpac import Pac
-from tensorpac.signals import pac_signals_tort
+from torchpac import Pac
+from torchpac.signals import pac_signals_tort
 from brainets.utils import normalize
 
 import seaborn as sns

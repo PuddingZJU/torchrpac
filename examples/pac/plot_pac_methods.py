@@ -6,8 +6,8 @@ Comparison of the implemented PAC methods
 This script offers a comparison between all of the implemented PAC methods, in
 particular the methods that are computed across times-points.
 """
-from tensorpac import Pac
-from tensorpac.signals import pac_signals_wavelet
+from torchpac import Pac
+from torchpac.signals import pac_signals_wavelet
 
 import matplotlib.pyplot as plt
 

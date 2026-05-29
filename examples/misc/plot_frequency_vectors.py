@@ -3,7 +3,7 @@
 Define frequency vectors
 ========================
 
-In Tensorpac, you can define your phase and amplitude vectors in sevral ways :
+In Torchpac, you can define your phase and amplitude vectors in sevral ways :
 
 * Manually define one band (ex : [2, 4])
 * Define multiple bands using a list/tuple/array (ex : [[2, 4], [5, 7]])
@@ -13,7 +13,7 @@ In Tensorpac, you can define your phase and amplitude vectors in sevral ways :
 """
 import matplotlib.pyplot as plt
 import numpy as np
-from tensorpac.utils import pac_vec
+from torchpac.utils import pac_vec
 
 
 def plot(nb, pvec, avec, title):

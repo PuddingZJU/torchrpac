@@ -12,9 +12,9 @@ API
 Compute phase-amplitude coupling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:py:mod:`tensorpac`:
+:py:mod:`torchpac`:
 
-.. currentmodule:: tensorpac
+.. currentmodule:: torchpac
 
 .. autosummary::
    :toctree: generated/
@@ -26,9 +26,9 @@ Compute phase-amplitude coupling
 Utility functions
 ~~~~~~~~~~~~~~~~~
 
-:py:mod:`tensorpac.utils`:
+:py:mod:`torchpac.utils`:
 
-.. currentmodule:: tensorpac.utils
+.. currentmodule:: torchpac.utils
 
 .. autosummary::
    :toctree: generated/
@@ -43,9 +43,9 @@ Utility functions
 Generate synthetic signals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:py:mod:`tensorpac.signals`:
+:py:mod:`torchpac.signals`:
 
-.. currentmodule:: tensorpac.signals
+.. currentmodule:: torchpac.signals
 
 .. autosummary::
    :toctree: generated/
@@ -56,9 +56,9 @@ Generate synthetic signals
 Statistics
 ~~~~~~~~~~
 
-:py:mod:`tensorpac.stats`:
+:py:mod:`torchpac.stats`:
 
-.. currentmodule:: tensorpac.stats
+.. currentmodule:: torchpac.stats
 
 .. autosummary::
    :toctree: generated/
@@ -69,18 +69,18 @@ Statistics
 Individual methods
 ~~~~~~~~~~~~~~~~~~
 
-:py:mod:`tensorpac.methods`:
+:py:mod:`torchpac.methods`:
 
 PAC methods
 +++++++++++
 
-If you don't want to use the :class:`tensorpac.Pac` class, you can also manually import the method of your choice
+If you don't want to use the :class:`torchpac.Pac` class, you can also manually import the method of your choice
 and use it on phase / amplitude to compute PAC. Note that some functions have both a tensor or Numba-based implementation.
 
 Tensor-based implementation
 ***************************
 
-.. currentmodule:: tensorpac.methods
+.. currentmodule:: torchpac.methods
 
 .. autosummary::
    :toctree: generated/
@@ -108,7 +108,7 @@ Numba-based implementation
 Event Related PAC methods
 +++++++++++++++++++++++++
 
-.. currentmodule:: tensorpac.methods
+.. currentmodule:: torchpac.methods
 
 .. autosummary::
    :toctree: generated/
@@ -119,7 +119,7 @@ Event Related PAC methods
 Preferred phase
 +++++++++++++++
 
-.. currentmodule:: tensorpac.methods
+.. currentmodule:: torchpac.methods
 
 .. autosummary::
    :toctree: generated/
@@ -129,7 +129,7 @@ Preferred phase
 Surrogates methods
 ++++++++++++++++++
 
-.. currentmodule:: tensorpac.methods
+.. currentmodule:: torchpac.methods
 
 .. autosummary::
    :toctree: generated/
@@ -141,7 +141,7 @@ Surrogates methods
 Normalization
 +++++++++++++
 
-.. currentmodule:: tensorpac.methods
+.. currentmodule:: torchpac.methods
 
 .. autosummary::
    :toctree: generated/

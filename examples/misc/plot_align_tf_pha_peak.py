@@ -8,15 +8,15 @@ according to a phase. In particular, a time-point of reference is first
 defined (`cue`). Then, the closest peak phase is found around this cue and the
 phase is shifted so that the peak of the phase is aligned with the cue.
 Finally, the same shift is then applied to the time-frequency representation.
-For an extended description, see :class:`tensorpac.utils.PeakLockedTF`
+For an extended description, see :class:`torchpac.utils.PeakLockedTF`
 
 This realignment can be a great tool to visualize the emergence of a
 phase-amplitude coupling according to a specific phase.
 """
 import numpy as np
 
-from tensorpac.signals import pac_signals_wavelet
-from tensorpac.utils import PeakLockedTF
+from torchpac.signals import pac_signals_wavelet
+from torchpac.utils import PeakLockedTF
 
 import matplotlib.pyplot as plt
 
@@ -40,7 +40,7 @@ times = np.linspace(-1, 1, n_times)
 ###############################################################################
 # Define the peak-locking object and realign TF representations
 ###############################################################################
-# then, we define an instance of :class:`tensorpac.utils.PeakLockedTF`. This
+# then, we define an instance of :class:`torchpac.utils.PeakLockedTF`. This
 # is assessed by using a reference time-point (here we used a cue at 0 second),
 # a single phase interval and several amplitudes
 

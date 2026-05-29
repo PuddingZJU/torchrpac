@@ -2,9 +2,9 @@
 import json
 with open("../../paper.json", 'r') as f: cfg = json.load(f)  # noqa
 
-from tensorpac import Pac
-from tensorpac.signals import pac_signals_tort, pac_signals_wavelet
-from tensorpac.utils import pac_trivec, PSD
+from torchpac import Pac
+from torchpac.signals import pac_signals_tort, pac_signals_wavelet
+from torchpac.utils import pac_trivec, PSD
 
 from time import sleep
 

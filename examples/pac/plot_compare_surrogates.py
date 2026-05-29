@@ -18,8 +18,8 @@ couplings. This includes :
 """
 import matplotlib.pyplot as plt
 
-from tensorpac import Pac
-from tensorpac.signals import pac_signals_wavelet
+from torchpac import Pac
+from torchpac.signals import pac_signals_wavelet
 
 ###############################################################################
 # Simulate artificial coupling
@@ -44,7 +44,7 @@ data, time = pac_signals_wavelet(sf=sf, f_pha=f_pha, f_amp=f_amp, noise=3.,
 # be useful then because it avoid to do it each time we're going to compute the
 # PAC.
 
-# define a :class:`tensorpac.Pac` object and use the MVL as the main method
+# define a :class:`torchpac.Pac` object and use the MVL as the main method
 # for measuring PAC
 p = Pac(idpac=(1, 0, 0), f_pha=(3, 10, 1, .2), f_amp=(50, 90, 5, 1),
         dcomplex='wavelet', width=12)
@@ -66,7 +66,7 @@ for i, k in enumerate(range(4)):
     # change the pac method
     p.idpac = (5, k, 1)
     # compute only the pac without filtering
-    xpac = p.fit(phases, amplitudes, n_perm=20, random_state=0)
+    xpac = p.fit(phases, amplitudes, n_perm=20)
     # plot
     title = p.str_surro.replace(' (', '\n(')
     plt.subplot(2, 2, k + 1)

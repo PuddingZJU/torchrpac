@@ -9,7 +9,7 @@ said differently, it provides a measure of the consistency across trials.
 """
 import numpy as np
 
-from tensorpac.utils import ITC, PSD
+from torchpac.utils import ITC, PSD
 
 import matplotlib.pyplot as plt
 

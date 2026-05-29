@@ -1,7 +1,7 @@
 """Test random signals generation."""
 import numpy as np
 
-from tensorpac.signals import pac_signals_wavelet, pac_signals_tort
+from torchpac.signals import pac_signals_wavelet, pac_signals_tort
 
 
 class TestSignals(object):

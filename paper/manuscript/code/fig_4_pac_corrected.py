@@ -2,8 +2,8 @@
 import json
 with open("../../paper.json", 'r') as f: cfg = json.load(f)  # noqa
 
-from tensorpac.signals import pac_signals_tort, pac_signals_wavelet
-from tensorpac import Pac
+from torchpac.signals import pac_signals_tort, pac_signals_wavelet
+from torchpac import Pac
 
 import seaborn as sns
 import matplotlib.pyplot as plt

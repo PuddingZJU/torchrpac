@@ -1,4 +1,4 @@
-"""Tensorpac methods."""
+"""Torchpac methods."""
 from .meth_pac import (
     mean_vector_length, modulation_index, heights_ratio, norm_direct_pac,
     phase_locking_value, gauss_cop_pac)  # noqa

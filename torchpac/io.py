@@ -1,4 +1,4 @@
-"""Define tensorpac logger.
+"""Define torchpac logger.
 
 See :
 https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
@@ -21,7 +21,7 @@ COLORS = {
 }
 FORMAT = {'compact': "$BOLD%(levelname)s | %(message)s",
           'spacy': "$BOLD%(levelname)-19s$RESET | %(message)s",
-          'tensorpac': "$BOLD%(name)s-%(levelname)-19s$RESET | %(message)s",
+          'torchpac': "$BOLD%(name)s-%(levelname)-19s$RESET | %(message)s",
           'print': "%(message)s",
           }
 
@@ -67,9 +67,9 @@ class _StreamHandler(logging.StreamHandler):
         logging.StreamHandler.__init__(self, sys.stderr)
         self.setFormatter(_lf)
         self._str_pattern = None
-        self.emit = self._tensorpac_emit
+        self.emit = self._torchpac_emit
 
-    def _tensorpac_emit(self, record, *args):
+    def _torchpac_emit(self, record, *args):
         msg = record.getMessage()
         test = self._match_pattern(record, msg)
         if test:
@@ -89,7 +89,7 @@ class _StreamHandler(logging.StreamHandler):
             return message
 
 
-logger = logging.getLogger('tensorpac')
+logger = logging.getLogger('torchpac')
 _lf = _Formatter()
 _lh = _StreamHandler()  # needs _lf to exist
 logger.addHandler(_lh)
@@ -125,7 +125,7 @@ def set_log_level(verbose=None, match=None):
     """
     # if verbose is None:
     #     verbose = "INFO"
-    logger = logging.getLogger('tensorpac')
+    logger = logging.getLogger('torchpac')
     if isinstance(verbose, bool):
         verbose = 'INFO' if verbose else 'WARNING'
     if isinstance(verbose, str):

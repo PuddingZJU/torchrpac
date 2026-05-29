@@ -10,8 +10,8 @@ amplitudes.
 """
 import numpy as np
 
-from tensorpac import PreferredPhase
-from tensorpac.signals import pac_signals_wavelet
+from torchpac import PreferredPhase
+from torchpac.signals import pac_signals_wavelet
 
 import matplotlib.pyplot as plt
 

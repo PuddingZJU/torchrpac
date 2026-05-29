@@ -1,10 +1,10 @@
 """Test I/O."""
 import logging
 
-from tensorpac.io import (set_log_level, is_pandas_installed,
+from torchpac.io import (set_log_level, is_pandas_installed,
                           is_statsmodels_installed, progress_bar)
 
-logger = logging.getLogger('tensorpac')
+logger = logging.getLogger('torchpac')
 
 
 levels = ['profiler', 'debug', 'info', 'warning', 'error', 'critical']

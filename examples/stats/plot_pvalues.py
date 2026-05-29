@@ -4,18 +4,18 @@ Compute and plot the p-values
 =============================
 
 This example illustrates how to compute and plot the p-values. To this end,
-Tensorpac uses permutations to estimate the distribution of PAC that could be
+Torchpac uses permutations to estimate the distribution of PAC that could be
 obtained by chance. Then, the true PAC estimation is compared with those
 surrogates in order to get the p-values.
 
 Note that the correction for multiple comparisons is automatically performed
-across all phases and amplitudes. Tensorpac uses the maximum statistics to
+across all phases and amplitudes. Torchpac uses the maximum statistics to
 perform this correction. Indeed, the permutations are computed for each
 (phase, amplitude) pairs. The p-values are then inferred using the maximum
 across all of the pairs.
 """
-from tensorpac import Pac
-from tensorpac.signals import pac_signals_wavelet
+from torchpac import Pac
+from torchpac.signals import pac_signals_wavelet
 
 import matplotlib.pyplot as plt
 
@@ -44,7 +44,7 @@ data, time = pac_signals_wavelet(f_pha=f_pha, f_amp=f_amp, noise=.8,
 # Bahramisharif et al. 2013 :cite:`bahramisharif2013propagating` and also
 # recommended by Aru et al. 2015 :cite:`aru2015untangling`. This method
 # consists in swapping two time blocks of amplitudes cut at a random time
-# point. Then, we used the method :class:`tensorpac.Pac.infer_pvalues` in order
+# point. Then, we used the method :class:`torchpac.Pac.infer_pvalues` in order
 # to get the corrected p-values across all possible (phase, amplitude)
 # frequency pairs.
 
@@ -60,7 +60,7 @@ pval = p.infer_pvalues(p=0.05)
 xpac_smean = xpac[pval < .05].mean()
 
 # if you want to see how the surrogates looks like, you can have to access
-# using :class:`tensorpac.Pac.surrogates`
+# using :class:`torchpac.Pac.surrogates`
 surro = p.surrogates.squeeze()
 print(f"Surrogates shape (n_perm, n_amp, n_pha) : {surro.shape}")
 # get the maximum of the surrogates across (phase, amplitude) pairs

@@ -1,9 +1,9 @@
 """Test PAC methods."""
 import numpy as np
-from tensorpac.methods.meth_switch import get_pac_fcn, pacstr
-from tensorpac.methods.meth_surrogates import compute_surrogates, normalize
-from tensorpac.methods.meth_pp import preferred_phase
-from tensorpac.methods.meth_erpac import erpac, ergcpac, _ergcpac_perm
+from torchpac.methods.meth_switch import get_pac_fcn, pacstr
+from torchpac.methods.meth_surrogates import compute_surrogates, normalize
+from torchpac.methods.meth_pp import preferred_phase
+from torchpac.methods.meth_erpac import erpac, ergcpac, _ergcpac_perm
 
 n_pac_range = range(1, 7)
 n_sur_range = range(4)

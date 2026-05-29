@@ -3,9 +3,9 @@ import logging
 
 import numpy as np
 
-from tensorpac.io import is_pandas_installed, is_statsmodels_installed
+from torchpac.io import is_pandas_installed, is_statsmodels_installed
 
-logger = logging.getLogger('tensorpac')
+logger = logging.getLogger('torchpac')
 
 
 def test_stationarity(x, p=.05):

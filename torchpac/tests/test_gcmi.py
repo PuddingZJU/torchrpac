@@ -1,8 +1,8 @@
 """Test gcmi related functions."""
 import numpy as np
 
-from tensorpac.gcmi import copnorm, nd_mi_gg
-from tensorpac.config import CONFIG
+from torchpac.gcmi import copnorm, nd_mi_gg
+from torchpac.config import CONFIG
 
 
 class TestGcmi(object):

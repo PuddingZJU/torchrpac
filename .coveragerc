@@ -1,7 +1,7 @@
 [run]
 branch = True
-source = tensorpac
-include = */tensorpac/*
+source = torchpac
+include = */torchpac/*
 omit =
     */setup.py
     */test/*

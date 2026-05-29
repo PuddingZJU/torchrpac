@@ -4,11 +4,14 @@ import logging
 import numpy as np
 from scipy.signal import periodogram
 
-from tensorpac.methods.meth_pac import _kl_hr
-from tensorpac.pac import _PacObj, _PacVisual
-from tensorpac.io import set_log_level
+from torchpac.methods.meth_pac import _kl_hr
+from torchpac.pac import _PacObj, _PacVisual
+from torchpac.io import set_log_level
 
-logger = logging.getLogger('tensorpac')
+from matplotlib.gridspec import GridSpec
+import matplotlib.pyplot as plt
+
+logger = logging.getLogger('torchpac')
 
 
 def pac_vec(f_pha='mres', f_amp='mres'):
@@ -236,7 +239,6 @@ class PSD(object):
         ax : Matplotlib axis
             The matplotlib axis that contains the figure
         """
-        import matplotlib.pyplot as plt
         # manage input variables
         kw['fz_labels'] = kw.get('fz_labels', fz_labels)
         kw['fz_title'] = kw.get('fz_title', fz_title)
@@ -527,7 +529,7 @@ class PeakLockedTF(_PacObj, _PacVisual):
             * An integer and `times` is None to indicate that you want to
               realign according to a time-point in sample
             * A integer or a float with `times` the time vector if you want
-              that Tensorpac automatically infer the sample number around which
+              that Torchpac automatically infer the sample number around which
               to align
     times : array_like | None
         Time vector
@@ -684,10 +686,8 @@ class PeakLockedTF(_PacObj, _PacVisual):
             (`power[edges:-edges]`).
         kwargs : dict | {}
             Additional arguments are sent to the
-            :class:`tensorpac.utils.PeakLockedTF.pacplot` method
+            :class:`torchpac.utils.PeakLockedTF.pacplot` method
         """
-        import matplotlib.pyplot as plt
-        from matplotlib.gridspec import GridSpec
         # manage additional arguments
         kwargs['colorbar'] = False
         kwargs['ylabel'] = 'Frequency for amplitude (hz)'

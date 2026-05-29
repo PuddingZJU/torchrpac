@@ -2,29 +2,48 @@
 import numpy as np
 import logging
 
-from tensorpac.spectral import spectral, hilbertm
-from tensorpac.methods import (get_pac_fcn, pacstr, compute_surrogates,
+from torchpac.   spectral import spectral, hilbertm
+from torchpac.methods import (get_pac_fcn, pacstr, compute_surrogates,
                                erpac, ergcpac, _ergcpac_perm, preferred_phase,
                                normalize)
-from tensorpac.gcmi import copnorm
-from tensorpac.visu import _PacVisual, _PacPlt, _PolarPlt
-from tensorpac.io import set_log_level
-from tensorpac.config import CONFIG
+from torchpac.gcmi import copnorm
+from torchpac.visu import _PacVisual, _PacPlt, _PolarPlt
+from torchpac.io import set_log_level
+from torchpac.config import CONFIG
 
-logger = logging.getLogger('tensorpac')
+logger = logging.getLogger('torchpac')
+
+
+def _resolve_device(device):
+    """Return (torch.device, torch.dtype) or (None, None) for CPU fallback."""
+    if device is None or device == 'cpu':
+        return None, None
+    try:
+        import torch
+        dev   = torch.device(device)
+        dtype = torch.float32
+        # quick smoke-test
+        torch.zeros(1, device=dev)
+        return dev, dtype
+    except Exception as e:
+        logger.warning(f"GPU device '{device}' unavailable ({e}); falling back to CPU.")
+        return None, None
 
 
 class _PacObj(object):
     """Main class for relative PAC objects."""
 
     def __init__(self, f_pha=[2, 4], f_amp=[60, 200], dcomplex='hilbert',
-                 cycle=(3, 6), width=7):
+                 cycle=(3, 6), width=7, device='cpu'):
         # Frequency checking :
-        from tensorpac.utils import pac_vec
+        from torchpac.utils import pac_vec
         self._f_pha, self._f_amp = pac_vec(f_pha, f_amp)
         self._xvec, self._yvec = self.f_pha.mean(1), self.f_amp.mean(1)
         # Check spectral properties :
         self._speccheck(dcomplex, cycle, width)
+        # GPU device setup
+        self._torch_device, self._torch_dtype = _resolve_device(device)
+        self._use_gpu = self._torch_device is not None
 
     def __str__(self):
         """String representation."""
@@ -62,7 +81,7 @@ class _PacObj(object):
         assert isinstance(sf, (int, float)), ("The sampling frequency must be "
                                               "a float number.")
         # Compatibility between keepfilt and wavelet :
-        if (keepfilt is True) and (self._dcomplex is 'wavelet'):
+        if (keepfilt is True) and (self._dcomplex == 'wavelet'):
             raise ValueError("Using wavelet for the complex decomposition do "
                              "not allow to get filtered data only. Set the "
                              "keepfilt parameter to False or set dcomplex to "
@@ -86,35 +105,42 @@ class _PacObj(object):
 
         # ---------------------------------------------------------------------
         # Switch between phase or amplitude :
-        if ftype is 'phase':
+        if ftype == 'phase':
             tosend = 'pha' if not keepfilt else None
-            xfilt = spectral(x, sf, self.f_pha, tosend, self._dcomplex,
-                             self._cycle[0], self._width, n_jobs)
-        elif ftype is 'amplitude':
+            f_vec  = self.f_pha
+            cyc    = self._cycle[0]
+        elif ftype == 'amplitude':
             tosend = 'amp' if not keepfilt else None
-            xfilt = spectral(x, sf, self.f_amp, tosend, self._dcomplex,
-                             self._cycle[1], self._width, n_jobs)
+            f_vec  = self.f_amp
+            cyc    = self._cycle[1]
+
+        if self._use_gpu:
+            from torchpac.spectral_gpu import spectral_gpu
+            xfilt = spectral_gpu(x, sf, f_vec, tosend, self._dcomplex,
+                                 cyc, self._width,
+                                 self._torch_device, self._torch_dtype)
+        else:
+            xfilt = spectral(x, sf, f_vec, tosend, self._dcomplex,
+                             cyc, self._width, n_jobs)
         return xfilt[..., edges]
 
     def _speccheck(self, dcomplex=None, cycle=None, width=None):
         """Check spectral parameters."""
-        # check cycle
+        # Check cycle :
         if cycle is not None:
             cycle = np.asarray(cycle)
-            if (len(cycle) is not 2) or not cycle.dtype == int:
-                logger.warning("Use automatic filter order")
-                self._cycle = (None, None)
+            if (len(cycle) != 2) or not cycle.dtype == int:
+                raise ValueError("Cycle must be a tuple of two integers.")
             else:
                 self._cycle = cycle
-
-        # check complex decomposition
+        # Check complex decomposition :
         if dcomplex is not None:
             if dcomplex not in ['hilbert', 'wavelet']:
                 raise ValueError("dcomplex must either be 'hilbert' or "
                                  "'wavelet'.")
             else:
                 self._dcomplex = dcomplex
-        # convert morlet's width
+        # Convert Morlet's width :
         if width is not None:
             self._width = int(width)
 
@@ -128,11 +154,11 @@ class _PacObj(object):
         assert pha.shape[1:] == amp.shape[1:], ("`pha` and `amp` must have the"
                                                 " same number of trials, "
                                                 "channels and time points")
-        if not np.ptp(pha) <= 2 * np.pi:
-            logger.error("Your phase is probably in degrees and should be "
-                         "converted in radians using either np.degrees or "
-                         "np.deg2rad.")
-        # force the phase to be in [-pi, pi]
+        assert np.ptp(pha) <= 2 * np.pi, ("Your phase is probably in degrees "
+                                          "and should be converted in radians "
+                                          "using either np.degrees or "
+                                          "np.deg2rad.")
+        # Force the phase to be in [-pi, pi] :
         pha = (pha + np.pi) % (2. * np.pi) - np.pi
         return pha, amp
 
@@ -155,7 +181,7 @@ class _PacObj(object):
         # ---------------------------------------------------------------------
         logger.info(f"    infer p-values at (p={p}, mcp={mcp})")
         # computes the pvalues
-        if mcp is 'maxstat':
+        if mcp == 'maxstat':
             max_p = perm.reshape(n_perm, -1).max(1)[np.newaxis, ...]
             nb_over = (effect[..., np.newaxis] <= max_p).sum(-1)
             pvalues = nb_over / n_perm
@@ -164,7 +190,7 @@ class _PacObj(object):
             pvalues = np.maximum(1. / n_perm, pvalues)
         elif mcp in ['fdr', 'bonferroni']:
             from mne.stats import fdr_correction, bonferroni_correction
-            fcn = fdr_correction if mcp is 'fdr' else bonferroni_correction
+            fcn = fdr_correction if mcp == 'fdr' else bonferroni_correction
             # compute the p-values
             pvalues = (effect[np.newaxis, ...] <= perm).sum(0) / n_perm
             pvalues = np.maximum(1. / n_perm, pvalues)
@@ -246,30 +272,30 @@ class Pac(_PacObj, _PacPlt):
         * First digit : refer to the pac method
 
             - 1 : Mean Vector Length (MVL) :cite:`canolty2006high`
-              (see :func:`tensorpac.methods.mean_vector_length`)
+              (see :func:`torchpac.methods.mean_vector_length`)
             - 2 : Modulation Index (MI) :cite:`tort2010measuring`
-              (see :func:`tensorpac.methods.modulation_index`)
+              (see :func:`torchpac.methods.modulation_index`)
             - 3 : Heights Ratio (HR) :cite:`lakatos2005oscillatory`
-              (see :func:`tensorpac.methods.heights_ratio`)
+              (see :func:`torchpac.methods.heights_ratio`)
             - 4 : ndPAC :cite:`ozkurt2012statistically`
-              (see :func:`tensorpac.methods.norm_direct_pac`)
+              (see :func:`torchpac.methods.norm_direct_pac`)
             - 5 : Phase-Locking Value (PLV)
               :cite:`penny2008testing,lachaux1999measuring`
-              (see :func:`tensorpac.methods.phase_locking_value`)
+              (see :func:`torchpac.methods.phase_locking_value`)
             - 6 : Gaussian Copula PAC (GCPAC) :cite:`ince2017statistical`
-              (see :func:`tensorpac.methods.gauss_cop_pac`)
+              (see :func:`torchpac.methods.gauss_cop_pac`)
 
         * Second digit : refer to the method for computing surrogates
 
             - 0 : No surrogates
             - 1 : Swap phase / amplitude across trials
               :cite:`tort2010measuring`
-              (see :func:`tensorpac.methods.swap_pha_amp`)
+              (see :func:`torchpac.methods.swap_pha_amp`)
             - 2 : Swap amplitude time blocks
               :cite:`bahramisharif2013propagating`
-              (see :func:`tensorpac.methods.swap_blocks`)
+              (see :func:`torchpac.methods.swap_blocks`)
             - 3 : Time lag :cite:`canolty2006high`
-              (see :func:`tensorpac.methods.time_lag`)
+              (see :func:`torchpac.methods.time_lag`)
 
         * Third digit : refer to the normalization method for correction
 
@@ -310,12 +336,21 @@ class Pac(_PacObj, _PacPlt):
 
     def __init__(self, idpac=(1, 2, 3), f_pha=[2, 4], f_amp=[60, 200],
                  dcomplex='hilbert', cycle=(3, 6), width=7, n_bins=18,
-                 verbose=None):
-        """Check and initialize."""
+                 device='cpu', verbose=None):
+        """Check and initialize.
+
+        Parameters
+        ----------
+        device : str | 'cpu'
+            PyTorch device string, e.g. ``'cpu'``, ``'cuda'``, ``'cuda:0'``.
+            When a CUDA device is specified all heavy computation (filtering,
+            PAC estimation, surrogate generation) runs on the GPU and results
+            are returned as ordinary numpy arrays.
+        """
         set_log_level(verbose)
         self._idcheck(idpac)
         _PacObj.__init__(self, f_pha=f_pha, f_amp=f_amp, dcomplex=dcomplex,
-                         cycle=cycle, width=width)
+                         cycle=cycle, width=width, device=device)
         _PacPlt.__init__(self)
         self.n_bins = int(n_bins)
         logger.info("Phase Amplitude Coupling object defined")
@@ -367,9 +402,16 @@ class Pac(_PacObj, _PacPlt):
         # input checking
         pha, amp = self._phampcheck(pha, amp)
         self._pvalues, self._surrogates = None, None
-        # for the plv, extract the phase of the amplitude
+        # for the plv, extract the phase of the amplitude envelope
         if self._idpac[0] == 5:
-            amp = np.angle(hilbertm(amp))
+            if self._use_gpu:
+                from torchpac.spectral_gpu import _hilbert_gpu
+                import torch
+                amp_t = torch.tensor(amp, dtype=self._torch_dtype,
+                                     device=self._torch_device)
+                amp = _hilbert_gpu(amp_t).angle().cpu().numpy().astype(np.float64)
+            else:
+                amp = np.angle(hilbertm(amp))
 
         # ---------------------------------------------------------------------
         # check if permutations should be computed
@@ -385,13 +427,32 @@ class Pac(_PacObj, _PacPlt):
         # copnorm if gaussian copula is used
         if self._idpac[0] == 6:
             logger.debug(f"    copnorm the phase and the amplitude")
-            pha = copnorm(np.stack([np.sin(pha), np.cos(pha)], axis=-2))
-            amp = copnorm(amp[..., np.newaxis, :])
+            if self._use_gpu:
+                import torch
+                from torchpac.gcmi_gpu import copnorm_gpu
+                pha_t = torch.tensor(
+                    np.stack([np.sin(pha), np.cos(pha)], axis=-2),
+                    dtype=self._torch_dtype, device=self._torch_device)
+                amp_t = torch.tensor(
+                    amp[..., np.newaxis, :],
+                    dtype=self._torch_dtype, device=self._torch_device)
+                pha = copnorm_gpu(pha_t).cpu().numpy().astype(np.float64)
+                amp = copnorm_gpu(amp_t).cpu().numpy().astype(np.float64)
+            else:
+                pha = copnorm(np.stack([np.sin(pha), np.cos(pha)], axis=-2))
+                amp = copnorm(amp[..., np.newaxis, :])
 
         # ---------------------------------------------------------------------
         # true pac estimation
         logger.info(f'    true PAC estimation using {self.method}')
-        fcn = get_pac_fcn(self.idpac[0], self.n_bins, p)
+        if self._use_gpu:
+            impl = 'gpu'
+            fcn  = get_pac_fcn(self.idpac[0], self.n_bins, p,
+                                implementation=impl,
+                                device=self._torch_device,
+                                dtype=self._torch_dtype)
+        else:
+            fcn = get_pac_fcn(self.idpac[0], self.n_bins, p)
         pac = fcn(pha, amp)
         self._pac = pac.copy()
 
@@ -402,8 +463,15 @@ class Pac(_PacObj, _PacPlt):
                 random_state = int(np.random.randint(0, 10000, size=1))
             logger.info(f"    compute surrogates ({self.str_surro}, {n_perm} "
                         f"permutations, random_state={random_state})")
-            surro = compute_surrogates(pha, amp, self.idpac[1], fcn, n_perm,
-                                       n_jobs, random_state)
+            if self._use_gpu:
+                from torchpac.methods.meth_surrogates_gpu import \
+                    compute_surrogates_gpu
+                surro = compute_surrogates_gpu(
+                    pha, amp, self.idpac[1], fcn, n_perm,
+                    random_state, self._torch_device, self._torch_dtype)
+            else:
+                surro = compute_surrogates(pha, amp, self.idpac[1], fcn,
+                                           n_perm, n_jobs, random_state)
             self._surrogates = surro
 
             # infer pvalues
@@ -412,10 +480,13 @@ class Pac(_PacObj, _PacPlt):
         # ---------------------------------------------------------------------
         # normalize (if needed)
         if self._idpac[2] != 0:
-            # Get the mean / deviation of surrogates
             logger.info("    normalize true PAC estimation by surrogates "
                         f"({self.str_norm})")
-            normalize(self.idpac[2], pac, surro)
+            if self._use_gpu:
+                from torchpac.methods.meth_surrogates_gpu import normalize_gpu
+                normalize_gpu(self.idpac[2], pac, surro)
+            else:
+                normalize(self.idpac[2], pac, surro)
 
         return pac
 
@@ -480,9 +551,16 @@ class Pac(_PacObj, _PacPlt):
         pha = self.filter(sf, x_pha, 'phase', **kw)
         amp = self.filter(sf, x_amp, 'amplitude', **kw)
 
-        # Special cases :
+        # Special cases : PLV needs the phase of the amplitude signal
         if self._idpac[0] == 5:
-            amp = np.angle(hilbertm(amp))
+            if self._use_gpu:
+                from torchpac.spectral_gpu import _hilbert_gpu
+                import torch
+                amp_t = torch.tensor(amp, dtype=self._torch_dtype,
+                                     device=self._torch_device)
+                amp = _hilbert_gpu(amp_t).angle().cpu().numpy().astype(np.float64)
+            else:
+                amp = np.angle(hilbertm(amp))
 
         # Compute pac :
         return self.fit(pha, amp, p=p, mcp=mcp, n_perm=n_perm, n_jobs=n_jobs,
@@ -599,11 +677,18 @@ class EventRelatedPac(_PacObj, _PacVisual):
     """
 
     def __init__(self, f_pha=[2, 4], f_amp=[60, 200], dcomplex='hilbert',
-                 cycle=(3, 6), width=7, verbose=None):
-        """Check and initialize."""
+                 cycle=(3, 6), width=7, device='cpu', verbose=None):
+        """Check and initialize.
+
+        Parameters
+        ----------
+        device : str | 'cpu'
+            PyTorch device string (e.g. ``'cuda'``).  GPU acceleration is
+            applied to both filtering and ERPAC estimation.
+        """
         set_log_level(verbose)
         _PacObj.__init__(self, f_pha=f_pha, f_amp=f_amp, dcomplex=dcomplex,
-                         cycle=cycle, width=width)
+                         cycle=cycle, width=width, device=device)
         _PacPlt.__init__(self)
         logger.info("Event Related PAC object defined")
 
@@ -649,25 +734,54 @@ class EventRelatedPac(_PacObj, _PacVisual):
         self._pvalues = None
         # move the trial axis to the end (n_freqs, n_times, n_epochs)
         pha, amp = np.moveaxis(pha, 1, -1), np.moveaxis(amp, 1, -1)
-        # method switch
+
+        # method switch -------------------------------------------------------
         if method == 'circular':
             self.method = "ERPAC (Voytek et al. 2013)"
             logger.info(f"    Compute {self.method}")
-            self._erpac, self._pvalues = erpac(pha, amp)
+            if self._use_gpu:
+                from torchpac.methods.meth_erpac_gpu import erpac_gpu
+                self._erpac, self._pvalues = erpac_gpu(
+                    pha, amp, self._torch_device, self._torch_dtype)
+            else:
+                self._erpac, self._pvalues = erpac(pha, amp)
             self.infer_pvalues(p=p, mcp=mcp)
+
         elif method == 'gc':
             self.method = "Gaussian-Copula ERPAC"
             logger.info(f"    Compute {self.method}")
-            # copnorm phases and amplitudes then compute erpac
-            sco = copnorm(np.stack([np.sin(pha), np.cos(pha)], axis=-2))
-            amp = copnorm(amp)[..., np.newaxis, :]
-            self._erpac = ergcpac(sco, amp, smooth=smooth, n_jobs=n_jobs)
-            # compute permutations (if needed)
-            if isinstance(n_perm, int) and (n_perm > 0):
-                logger.info(f"    Compute {n_perm} permutations")
-                self._surrogates = _ergcpac_perm(sco, amp, smooth=smooth,
-                                                 n_jobs=n_jobs, n_perm=n_perm)
-                self.infer_pvalues(p=p, mcp=mcp)
+            if self._use_gpu:
+                import torch
+                from torchpac.gcmi_gpu import copnorm_gpu
+                from torchpac.methods.meth_erpac_gpu import (
+                    ergcpac_gpu, _ergcpac_perm_gpu)
+                pha_t = torch.tensor(
+                    np.stack([np.sin(pha), np.cos(pha)], axis=-2),
+                    dtype=self._torch_dtype, device=self._torch_device)
+                amp_t = torch.tensor(
+                    amp[..., np.newaxis, :],
+                    dtype=self._torch_dtype, device=self._torch_device)
+                sco = copnorm_gpu(pha_t).cpu().numpy().astype(np.float64)
+                amp = copnorm_gpu(amp_t).cpu().numpy().astype(np.float64)
+                self._erpac = ergcpac_gpu(sco, amp, smooth=smooth,
+                                          device=self._torch_device,
+                                          dtype=self._torch_dtype)
+                if isinstance(n_perm, int) and n_perm > 0:
+                    logger.info(f"    Compute {n_perm} permutations")
+                    self._surrogates = _ergcpac_perm_gpu(
+                        sco, amp, smooth=smooth, n_perm=n_perm,
+                        device=self._torch_device, dtype=self._torch_dtype)
+                    self.infer_pvalues(p=p, mcp=mcp)
+            else:
+                sco = copnorm(np.stack([np.sin(pha), np.cos(pha)], axis=-2))
+                amp = copnorm(amp)[..., np.newaxis, :]
+                self._erpac = ergcpac(sco, amp, smooth=smooth, n_jobs=n_jobs)
+                if isinstance(n_perm, int) and n_perm > 0:
+                    logger.info(f"    Compute {n_perm} permutations")
+                    self._surrogates = _ergcpac_perm(
+                        sco, amp, smooth=smooth, n_jobs=n_jobs, n_perm=n_perm)
+                    self.infer_pvalues(p=p, mcp=mcp)
+
         return self.erpac
 
     def filterfit(self, sf, x_pha, x_amp=None, method='circular', smooth=None,
@@ -751,7 +865,7 @@ class EventRelatedPac(_PacObj, _PacVisual):
             logger.info(f"    Correct p-values for multiple-comparisons using "
                         f"{mcp} correction of MNE-Python")
             from mne.stats import fdr_correction, bonferroni_correction
-            fcn = fdr_correction if mcp is 'fdr' else bonferroni_correction
+            fcn = fdr_correction if mcp == 'fdr' else bonferroni_correction
             _, self._pvalues = fcn(self._pvalues, alpha=p)
         else:
             assert hasattr(self, 'surrogates'), "No surrogates computed"

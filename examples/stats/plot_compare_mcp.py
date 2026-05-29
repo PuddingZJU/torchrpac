@@ -14,8 +14,8 @@ Note that for the FDR and Bonferroni corrections, MNE-Python is needed.
 """
 import numpy as np
 
-from tensorpac import Pac
-from tensorpac.signals import pac_signals_wavelet
+from torchpac import Pac
+from torchpac.signals import pac_signals_wavelet
 
 import matplotlib.pyplot as plt
 
@@ -43,7 +43,7 @@ data, time = pac_signals_wavelet(f_pha=f_pha, f_amp=f_amp, noise=.4,
 # distribution of surrogates. In this example, we used the method proposed by
 # Tort et al. 2010 :cite:`tort2010measuring`. This method consists in swapping
 # phase and amplitude trials. Then, we used the method
-# :class:`tensorpac.Pac.infer_pvalues` in order to get the corrected p-values
+# :class:`torchpac.Pac.infer_pvalues` in order to get the corrected p-values
 # across all possible (phase, amplitude) frequency pairs.
 
 # define the Pac object

@@ -1,10 +1,118 @@
 """Extract spectral informations from data."""
 import numpy as np
-from joblib import Parallel, delayed
-from scipy.signal import hilbert, filtfilt
-from scipy import fftpack
+#from joblib import Parallel, delayed
+from scipy.signal import filtfilt
+from scipy.fft import fft,ifft,next_fast_len
 
-from tensorpac.config import CONFIG
+from torchpac.config import CONFIG
+def hilbert(x, N=None, axis=-1):
+    """
+    Compute the analytic signal, using the Hilbert transform.
+
+    The transformation is done along the last axis by default.
+
+    Parameters
+    ----------
+    x : array_like
+        Signal data.  Must be real.
+    N : int, optional
+        Number of Fourier components.  Default: ``x.shape[axis]``
+    axis : int, optional
+        Axis along which to do the transformation.  Default: -1.
+
+    Returns
+    -------
+    xa : ndarray
+        Analytic signal of `x`, of each 1-D array along `axis`
+
+    Notes
+    -----
+    The analytic signal ``x_a(t)`` of signal ``x(t)`` is:
+
+    .. math:: x_a = F^{-1}(F(x) 2U) = x + i y
+
+    where `F` is the Fourier transform, `U` the unit step function,
+    and `y` the Hilbert transform of `x`. [1]_
+
+    In other words, the negative half of the frequency spectrum is zeroed
+    out, turning the real-valued signal into a complex signal.  The Hilbert
+    transformed signal can be obtained from ``np.imag(hilbert(x))``, and the
+    original signal from ``np.real(hilbert(x))``.
+
+    References
+    ----------
+    .. [1] Wikipedia, "Analytic signal".
+           https://en.wikipedia.org/wiki/Analytic_signal
+    .. [2] Leon Cohen, "Time-Frequency Analysis", 1995. Chapter 2.
+    .. [3] Alan V. Oppenheim, Ronald W. Schafer. Discrete-Time Signal
+           Processing, Third Edition, 2009. Chapter 12.
+           ISBN 13: 978-1292-02572-8
+
+    Examples
+    --------
+    In this example we use the Hilbert transform to determine the amplitude
+    envelope and instantaneous frequency of an amplitude-modulated signal.
+
+    >>> import numpy as np
+    >>> import matplotlib.pyplot as plt
+    >>> from scipy.signal import hilbert, chirp
+
+    >>> duration = 1.0
+    >>> fs = 400.0
+    >>> samples = int(fs*duration)
+    >>> t = np.arange(samples) / fs
+
+    We create a chirp of which the frequency increases from 20 Hz to 100 Hz and
+    apply an amplitude modulation.
+
+    >>> signal = chirp(t, 20.0, t[-1], 100.0)
+    >>> signal *= (1.0 + 0.5 * np.sin(2.0*np.pi*3.0*t) )
+
+    The amplitude envelope is given by magnitude of the analytic signal. The
+    instantaneous frequency can be obtained by differentiating the
+    instantaneous phase in respect to time. The instantaneous phase corresponds
+    to the phase angle of the analytic signal.
+
+    >>> analytic_signal = hilbert(signal)
+    >>> amplitude_envelope = np.abs(analytic_signal)
+    >>> instantaneous_phase = np.unwrap(np.angle(analytic_signal))
+    >>> instantaneous_frequency = (np.diff(instantaneous_phase) /
+    ...                            (2.0*np.pi) * fs)
+
+    >>> fig, (ax0, ax1) = plt.subplots(nrows=2)
+    >>> ax0.plot(t, signal, label='signal')
+    >>> ax0.plot(t, amplitude_envelope, label='envelope')
+    >>> ax0.set_xlabel("time in seconds")
+    >>> ax0.legend()
+    >>> ax1.plot(t[1:], instantaneous_frequency)
+    >>> ax1.set_xlabel("time in seconds")
+    >>> ax1.set_ylim(0.0, 120.0)
+    >>> fig.tight_layout()
+
+    """
+    x = np.asarray(x)
+    if np.iscomplexobj(x):
+        raise ValueError("x must be real.")
+    if N is None:
+        N = x.shape[axis]
+    if N <= 0:
+        raise ValueError("N must be positive.")
+
+    Xf = fft(x, N, axis=axis)
+    h = np.zeros(N, dtype=Xf.dtype)
+    if N % 2 == 0:
+        h[0] = h[N // 2] = 1
+        h[1:N // 2] = 2
+    else:
+        h[0] = 1
+        h[1:(N + 1) // 2] = 2
+
+    if x.ndim > 1:
+        ind = [np.newaxis] * x.ndim
+        ind[axis] = slice(None)
+        h = h[tuple(ind)]
+    x = ifft(Xf * h, axis=axis)
+    return x
 
 
 def hilbertm(x):
@@ -13,7 +121,7 @@ def hilbertm(x):
     x must have a shape of (..., n_pts)
     """
     n_pts = x.shape[-1]
-    fc = fftpack.helper.next_fast_len(n_pts)
+    fc = next_fast_len(n_pts)
     return hilbert(x, fc, axis=-1)[..., 0:n_pts]
 
 
@@ -42,7 +150,7 @@ def spectral(x, sf, f, stype, dcomplex, cycle, width, n_jobs):
     """
     n_freqs = f.shape[0]
     # Filtering + complex decomposition :
-    if dcomplex is 'hilbert':
+    if dcomplex == 'hilbert':
         # get filtering coefficients
         b = []
         a = np.zeros((n_freqs,), dtype=float)
@@ -52,21 +160,28 @@ def spectral(x, sf, f, stype, dcomplex, cycle, width, n_jobs):
             _b, a[k] = fir1(forder[k], f[k, :] / (sf / 2.))
             b += [_b]
         # Filt each time series :
-        xf = Parallel(n_jobs=n_jobs, **CONFIG['JOBLIB_CFG'])(delayed(filtfilt)(
-            b[k], a[k], x, padlen=forder[k], axis=-1) for k in range(n_freqs))
+        #xf = Parallel(n_jobs=n_jobs, **CONFIG['JOBLIB_CFG'])(delayed(filtfilt)(
+        #    b[k], a[k], x, padlen=forder[k], axis=-1) for k in range(n_freqs))
+        xf = []
+        for k in range(n_freqs):
+            xf.append(filtfilt(b[k], a[k], x, padlen=forder[k], axis=-1))
         # Use hilbert for the complex decomposition :
         xd = np.asarray(xf)
         if stype is not None:
-            xd = hilbertm(xd)
-    elif dcomplex is 'wavelet':
+            xd = hilbert(xd)
+    elif dcomplex == 'wavelet':
         f = f.mean(1)  # centered frequencies
-        xd = Parallel(n_jobs=n_jobs, **CONFIG['JOBLIB_CFG'])(delayed(morlet)(
-            x, sf, k, width) for k in f)
+        # xd = Parallel(n_jobs=n_jobs, **CONFIG['JOBLIB_CFG'])(delayed(morlet)(
+        #     x, sf, k, width) for k in f)
+        xd = []
+        for k in f:
+            xd.append(morlet(x, sf, k, width))
+        xd = np.asarray(xd)
 
     # Extract phase / amplitude :
-    if stype is 'pha':
+    if stype == 'pha':
         return np.angle(xd).astype(np.float64)
-    elif stype is 'amp':
+    elif stype == 'amp':
         return np.abs(xd).astype(np.float64)
     elif stype is None:
         return xd.astype(np.float64)
@@ -79,13 +194,10 @@ def spectral(x, sf, f, stype, dcomplex, cycle, width, n_jobs):
 
 
 def fir_order(fs, sizevec, flow, cycle=3):
-    if cycle is None:
-        filtorder = 3 * np.fix(fs / flow)
-    else:
-        filtorder = cycle * (fs // flow)
+    filtorder = cycle * (fs // flow)
 
-        if (sizevec < 3 * filtorder):
-            filtorder = (sizevec - 1) // 3
+    if (sizevec < 3 * filtorder):
+        filtorder = (sizevec - 1) // 3
 
     return int(filtorder)
 

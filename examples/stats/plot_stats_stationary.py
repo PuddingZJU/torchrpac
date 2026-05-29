@@ -9,7 +9,7 @@ Here, we are going to use the Augmented Dickey-Fuller test.
 """
 import numpy as np
 
-from tensorpac.stats import test_stationarity
+from torchpac.stats import test_stationarity
 
 import matplotlib.pyplot as plt
 
