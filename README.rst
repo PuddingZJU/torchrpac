@@ -5,13 +5,13 @@ Torchpac - Modify Tensorpac into a PyTorch-based ported version
 Description
 -----------
 
-Torchpac is an Modify Tensorpac into a PyTorch-based ported version
+Torchpac is an Modify Tensorpac into a PyTorch-based ported version, 
 Tensorpac is an Python open-source toolbox for computing Phase-Amplitude Coupling (PAC) using tensors and parallel computing for an efficient, and highly flexible modular implementation of PAC metrics both known and novel. Check out our `documentation <http://etiennecmb.github.io/tensorpac/>`_  for details.
 
 Installation
 ------------
 
-Torchpac uses NumPy, SciPy and joblib for parallel computing. To get started, just open your terminal and run :
+Torchpac uses PyTorch, NumPy, SciPy and joblib for parallel computing. To get started, just open your terminal and run :
 
 
 .. code-block:: console
