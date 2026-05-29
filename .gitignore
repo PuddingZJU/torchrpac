@@ -16,7 +16,7 @@ downloads/
 eggs/
 .eggs/
 .github/
-.claude/
+
 lib/
 lib64/
 parts/
@@ -26,6 +26,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.claude/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
