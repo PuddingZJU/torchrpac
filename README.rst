@@ -36,7 +36,7 @@ Code snippet & illustration
                                 dpha=10, damp=10, sf=sf, n_times=n_times)
 
   # Define a Pac object
-  p = Pac(idpac=(6, 0, 0), f_pha='hres', f_amp='hres')
+  p = Pac(idpac=(6, 0, 0), f_pha='hres', f_amp='hres',device="cuda:0")
   # Filter the data and extract pac
   xpac = p.filterfit(sf, data)
 
