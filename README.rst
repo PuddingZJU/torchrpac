@@ -11,12 +11,12 @@ Tensorpac is an Python open-source toolbox for computing Phase-Amplitude Couplin
 Installation
 ------------
 
-Torchpac uses PyTorch, NumPy, SciPy and joblib for parallel computing. To get started, just open your terminal and run :
+Torchpac uses NumPy, SciPy and PyTorch for parallel computing. To get started, just open your terminal and run :
 
 
 .. code-block:: console
 
-    $ pip install torchpac-0.6.5
+    $ pip install ./torchpac-0.6.5
 
 Code snippet & illustration
 ---------------------------
